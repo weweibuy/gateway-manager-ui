@@ -61,12 +61,34 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="参数值" prop="filterArgs.argsValue">
+            <el-form-item v-if="dictFilterArgsDict[index] == undefined || dictFilterArgsDict.length == 0"
+                          label="参数值"
+                          prop="filterArgs.argsValue">
               <el-input v-model="filterCreateForm.filterArgs[index].argsValue" style="width: 350px"></el-input>
             </el-form-item>
+
+            <el-form-item v-if="dictFilterArgsDict[index] != undefined && dictFilterArgsDict[index].length != 0"
+                          label="参数值" prop="filterArgs.argsValue">
+              <el-select v-model="filterCreateForm.filterArgs[index].argsValue" style="width: 350px"
+                         placeholder="请选择参数值">
+                <el-option
+                  v-for="item in dictFilterArgsDict[index]"
+                  :key="item.dictName"
+                  :label="item.dictValue"
+                  :value="item.dictValue">
+                  <span style="float: left">{{ item.dictValue }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.dictDesc }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+
+            <el-button id="freshBtn" v-show="false"></el-button>
+
+
             <el-form-item label="参数描述" prop="filterArgs.argsDesc">
               <el-input v-model="filterCreateForm.filterArgs[index].argsDesc" style="width: 350px"></el-input>
             </el-form-item>
+
 
             <el-form-item>
               <el-button style="margin-left: 400px" type="danger" v-show="filterCreateForm.filterArgs.length > 1"
@@ -128,6 +150,8 @@
         },
         dictFilters: [],
         dictFilterArgs: [],
+        dictFilterArgsDict: [],
+        dictFilterArgsHavingValues: false,
         rules: {
           routerId: [
             {required: true, message: '请输入路由id', trigger: 'blur'},
@@ -210,9 +234,8 @@
             this.filterCreateForm.dictId = this.dictFilters[i].id
           }
         }
-        this.handlerPredicateDictIdChange(this.predicateCreateForm.dictId)
+        this.handlerFilterDictIdChange(this.filterCreateForm.dictId)
       },
-
       handleFilterArgsNameChange(value, index) {
         for (let i = 0; i < this.dictFilterArgs.length; i++) {
           if (this.dictFilterArgs[i].dictValue == value) {
@@ -221,6 +244,8 @@
             this.filterCreateForm.filterArgs[index].dictType = this.dictFilterArgs[i].dictType
           }
         }
+        this.handleFilterArgsDictIdChange(this.filterCreateForm.filterArgs[index].dictId, index)
+        this.filterCreateForm.filterArgs[index].argsValue = '';
       },
       handleDeleteFilterArg(index) {
         this.filterCreateForm.filterArgs.splice(index, 1)
@@ -244,9 +269,27 @@
         }).catch(error => {
 
         }).finally(() => {
-
         })
-      }
+      },
+      handlerFilterDictIdChange(dictId) {
+        getChildByPid(dictId).then(response => {
+          this.dictFilterArgs = response.data
+        })
+      },
+      handleFilterArgsDictIdChange(dictId, index) {
+        getChildByPid(dictId).then(response => {
+          if (response.data != null && response.data.length > 0) {
+            this.dictFilterArgsDict[index] = response.data
+            this.dictFilterArgsDict.push({})
+          } else {
+            this.dictFilterArgsDict = []
+            this.dictFilterArgsDict.push({})
+            this.dictFilterArgsDict.pop()
+          }
+        }).finally(() => {
+        })
+      },
+
     }
   }
 </script>
