@@ -95,6 +95,33 @@ export const constantRoutes = [
       }
     ]
   },
+
+  {
+    path: '/router',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/router/index.vue'),
+        name: 'Router',
+        meta: { title: 'router', icon: 'documentation', affix: true }
+      }
+    ]
+  },
+
+  {
+    path: '/router/create',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/router/components/RouterCreate.vue'),
+        // name: 'Documentation',
+        // meta: { title: 'router', icon: 'documentation', affix: true }
+      }
+    ]
+  },
+
   {
     path: '/guide',
     component: Layout,
